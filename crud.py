@@ -8,39 +8,40 @@ Original file is located at
 """
 
 import sqlite3
+
 conn=sqlite3.connect("mydb.db")
-c=conn.cursor()
+c = conn.cursor()
 
 def create_table():
-  c.execute("""
-  CREATE TABLE IF NOT EXISTS users (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      name TEXT NOT NULL,
-      age INTEGER NOT NULL
-  )
-  """)
+    c.execute("""
+    CREATE TABLE IF NOT EXISTS users (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT NOT NULL,
+        age INTEGER NOT NULL
+    )
+    """)
 
-def insert(name,age):
-  c.execute("INSERT INTO users (name,age) VALUES (:name,:age)",{'name':name,'age':age})
-  conn.commit()
-  print("Inserted Successfully")
+def insert(name, age):
+    c.execute("INSERT INTO users (name, age) VALUES (?, ?)", (name, age))
+    conn.commit()
+    print("Inserted Successfully")
 
 def read():
-  c.execute("SELECT * FROM users")
-  users=c.fetchall()
-  for user in users:
-    print(user)
+    c.execute("SELECT * FROM users")
+    users = c.fetchall()
+    for user in users:
+      print(user)
+    return users 
 
-def update(name,age,id):
-  c.execute("UPDATE users SET name=:name,age=:age WHERE id=:id",{'name':name,'age':age,'id':id})
-  conn.commit()
-  print("Updated Successfully")
+def update(name, age, id):
+    c.execute("UPDATE users SET name=?, age=? WHERE id=?", (name, age, id))
+    conn.commit()
+    print("Updated Successfully")
 
 def delete(id):
-  c.execute("DELETE FROM users WHERE id=:id",{'id':id})
-  conn.commit()
-  print("Deleted Successfully")
-
+    c.execute("DELETE FROM users WHERE id=?", (id,))
+    conn.commit()
+    print("Deleted Successfully")
 
 if __name__ == "__main__":
   create_table()
