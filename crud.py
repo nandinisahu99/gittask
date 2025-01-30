@@ -26,12 +26,17 @@ def insert(name, age):
     conn.commit()
     print("Inserted Successfully")
 
-def read():
-    c.execute("SELECT * FROM users")
-    users = c.fetchall()
-    for user in users:
-      print(user)
-    return users 
+def read(user_id=None):
+    conn = get_db_connection()
+    c = conn.cursor()
+    if user_id:
+        c.execute("SELECT * FROM users WHERE id=?", (user_id,))
+        user = c.fetchone()
+    else:
+        c.execute("SELECT * FROM users")
+        user = c.fetchall()
+    return user
+
 
 def update(name, age, id):
     c.execute("UPDATE users SET name=?, age=? WHERE id=?", (name, age, id))
