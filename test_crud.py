@@ -9,33 +9,38 @@ Original file is located at
 
 
 import pytest
-from day_11 import create_table, insert, read, update, delete
+from crud import create_table, insert, read, update, delete
 
 @pytest.fixture
 def setup_database():
+    """Sets up the database before tests and cleans up after."""
     create_table()
-    insert("John", 35)  # ID = 1
-    yield
-    delete(1)  # Cleanup
+    insert("John", 35)  # Insert a test user with ID = 1
+    yield  # Run the test
+    delete(1)  # Cleanup after test
 
 def test_insert_user(setup_database):
-    insert("Jane", 28)  # ID = 2
-    user = read()  # Fetch user by ID
+    """Tests inserting a new user."""
+    insert("Jane", 28)  # Insert another user (ID = 2)
+    user = read(2)  # Fetch user by ID
     assert user is not None
     assert user[1] == "Jane"
     assert user[2] == 28
 
 def test_update_user(setup_database):
+    """Tests updating an existing user."""
     update("John Doe", 36, 1)
-    user = read()  # Fetch user by ID
+    user = read(1)  # Fetch updated user
     assert user is not None
     assert user[1] == "John Doe"
     assert user[2] == 36
 
 def test_delete_user(setup_database):
+    """Tests deleting a user."""
     delete(1)
-    user = read()  # Try to fetch deleted user
+    user = read(1)  # Try to fetch deleted user
     assert user is None  # User should not exist
+
 
 
 
