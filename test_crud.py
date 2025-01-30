@@ -13,25 +13,28 @@ from day_11 import create_table, insert, read, update, delete
 
 @pytest.fixture
 def setup_database():
+    """Setup test database."""
     create_table()
     insert("John", 35)
     yield
-    delete(1)
+    delete(1)  # Cleanup after test
 
 def test_insert_user(setup_database):
-    insert("Jane",28)
-    user = read()
-    assert user[1] == "Jane"
-    assert user[2] == 28
+    insert("Jane", 28)
+    users = read()
+    assert any(user[1] == "Jane" and user[2] == 28 for user in users)
 
 def test_update_user(setup_database):
-    update("John Doe",36,1)
-    user = read()
-    assert user[1] == "John Doe"
-    assert user[2] == 36
+    update("John Doe", 36, 1)
+    users = read()
+    updated_user = next((user for user in users if user[0] == 1), None)
+    assert updated_user is not None
+    assert updated_user[1] == "John Doe"
+    assert updated_user[2] == 36
 
 def test_delete_user(setup_database):
     delete(1)
-    user = read()
-    assert user is None
+    users = read()
+    assert all(user[0] != 1 for user in users)  # Check if user with ID 1 is deleted
+
 
