@@ -7,7 +7,6 @@ Original file is located at
     https://colab.research.google.com/drive/1cB1ZwLtHflkfmq0pMClctLk-hdLywYMO
 """
 
-!pip install pytest
 
 import pytest
 from day_11 import create_table, insert, read, update, delete
