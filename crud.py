@@ -9,10 +9,15 @@ Original file is located at
 
 import sqlite3
 
-conn=sqlite3.connect("mydb.db")
-c = conn.cursor()
+def connect_db():
+    """Establishes and returns a database connection and cursor."""
+    conn = sqlite3.connect("mydb.db")
+    c = conn.cursor()
+    return conn, c
 
 def create_table():
+    """Creates the users table if it does not exist."""
+    conn, c = connect_db()
     c.execute("""
     CREATE TABLE IF NOT EXISTS users (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -20,38 +25,52 @@ def create_table():
         age INTEGER NOT NULL
     )
     """)
+    conn.commit()
+    conn.close()
 
 def insert(name, age):
+    """Inserts a new user into the users table."""
+    conn, c = connect_db()
     c.execute("INSERT INTO users (name, age) VALUES (?, ?)", (name, age))
     conn.commit()
+    conn.close()
     print("Inserted Successfully")
 
-def read():
-    conn = get_db_connection()
-    c = conn.cursor()
-    c.execute("SELECT * FROM users")
-    user = c.fetchall()
+def read(user_id=None):
+    """Fetches all users or a single user if user_id is provided."""
+    conn, c = connect_db()
+    if user_id:
+        c.execute("SELECT * FROM users WHERE id=?", (user_id,))
+        user = c.fetchone()  # Fetch a single user
+    else:
+        c.execute("SELECT * FROM users")
+        user = c.fetchall()  # Fetch all users
+    conn.close()
     return user
 
-
-def update(name, age, id):
-    c.execute("UPDATE users SET name=?, age=? WHERE id=?", (name, age, id))
+def update(name, age, user_id):
+    """Updates a user's name and age based on the given ID."""
+    conn, c = connect_db()
+    c.execute("UPDATE users SET name=?, age=? WHERE id=?", (name, age, user_id))
     conn.commit()
+    conn.close()
     print("Updated Successfully")
 
-def delete(id):
-    c.execute("DELETE FROM users WHERE id=?", (id,))
+def delete(user_id):
+    """Deletes a user based on the given ID."""
+    conn, c = connect_db()
+    c.execute("DELETE FROM users WHERE id=?", (user_id,))
     conn.commit()
+    conn.close()
     print("Deleted Successfully")
 
 if __name__ == "__main__":
-  create_table()
-  insert("Nandini",24)
-  insert("Shivani",23)
-  insert("Aman",26)
-  read()
-  update("Shivani",22,2)
-  delete(2)
-  read()
-  conn.close()
+    create_table()
+    insert("Nandini", 24)
+    insert("Shivani", 23)
+    insert("Aman", 26)
+    print("Users after insertion:", read())
+    update("Shivani", 22, 2)
+    delete(2)
+    print("Users after update and delete:", read())
 
